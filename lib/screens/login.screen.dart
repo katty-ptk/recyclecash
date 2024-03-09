@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
       //     MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
     }
 
-    return SafeArea(
+      return SafeArea(
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _inputField(BuildContext context, Function login ) {
+  _inputField(BuildContext context, Function login) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -112,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         SizedBox(height: 20),
         ElevatedButton(
-          onPressed: () => login(),
+          onPressed: () {
+            login();
+          },
           style: ElevatedButton.styleFrom(
             shape: StadiumBorder(),
             padding: EdgeInsets.symmetric(vertical: 16),
