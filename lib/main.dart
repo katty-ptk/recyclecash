@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: isLoggedIn == true ? const HomeScreen() : const LoginScreen()
+      home: isLoggedIn == true ? const HomeScreen() : LoginScreen()
     );
   }
 }
