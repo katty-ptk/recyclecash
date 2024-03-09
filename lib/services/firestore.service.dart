@@ -60,7 +60,9 @@ class FirestoreService {
     return userTickets;
   }
 
-  Future<void> generateBarcode(String storeName, String originalBarcode, String price ) async {
+  Future<bool> generateBarcode(String storeName, String originalBarcode, String price ) async {
+    bool maxAmount = false;
+
     int originalPrice = int.parse(getPriceFromBarcode(originalBarcode));
 
     String suma = ( originalPrice + int.parse(price) ).toString();
@@ -68,24 +70,54 @@ class FirestoreService {
     print("new price: ${int.parse(price)}");
     print("sum: ${int.parse(suma)}");
 
-    String newBarcode = '';
+    if ( int.parse(suma) > 9950 ) {
+      maxAmount = true;
+    } else {
+      String newBarcode = '';
 
-    if ( storeName == 'penny' ) {
-      newBarcode = '2263000450910019200${suma}00';
-    } else if ( storeName == 'lidl') {
-      newBarcode = '2010${suma}2000000264203810';
+      if ( storeName == 'penny' ) {
+        newBarcode = '2263000450910019200${suma}00';
+      } else if ( storeName == 'lidl') {
+        newBarcode = '2010${suma}2000000264203810';
+      }
+
+      DocumentReference<Map<String, dynamic>> userDoc =
+      db.collection('users').doc('Osbm2OzwhYVd5fPFsWnHudTPezX2');
+
+      try {
+        userDoc.update({
+          storeName: newBarcode
+        });
+      } catch (error) {
+        print(error);
+      }
     }
 
-    DocumentReference<Map<String, dynamic>> userDoc =
-    db.collection('users').doc('Osbm2OzwhYVd5fPFsWnHudTPezX2');
+    return maxAmount;
 
-    try {
-      userDoc.update({
-        storeName: newBarcode
-      });
-    } catch (error) {
-      print(error);
+  }
+
+  Future<String> scanBarcode(String barcode, String storeName, String originalStoreBarcode ) async {
+    String res;
+
+    bool barcodeAlreadyUsed = await checkIfBarcodeWasAlreadyUsed(storeName, barcode);
+
+    if ( barcodeAlreadyUsed == true ){
+      res = 'BARCODE_USED';
+    } else {
+      String priceFromBarcode = await getPriceFromBarcode(barcode);
+
+      bool isMaxAmount = await generateBarcode(storeName, originalStoreBarcode, priceFromBarcode);
+
+      if ( isMaxAmount == true ) {
+        res = "MAX_AMOUNT";
+      } else {
+        res = 'BARCODE_GOOD';
+      }
     }
+
+    return res;
+
   }
 
   String getPriceFromBarcode( String barcode ) {
@@ -112,13 +144,22 @@ class FirestoreService {
       final store = await storeDoc.get();
       final storeData = store.data();
 
-      storeData?.entries.forEach((entry) {
-        if ( entry.value == barcode ) {
-         barcodeAlreadyUsed = true;
-        }
+      storeData!.entries.forEach((element) {
+        print("BARCODE ==> " + barcode);
+        print("SCANNED BARCODES ==> " + element.value.toString());
+
+        List<dynamic> values =  element.value;
+        values.forEach((element) {
+          print("ELEMEnT IS " + element);
+
+          if ( element == barcode ) {
+            print("barcode $barcode is already used");
+            barcodeAlreadyUsed = true;
+          }
+        });
       });
     } catch (error) {
-      print(error);
+      print("CAUGHT AN ERROR " + error.toString());
     }
 
     return barcodeAlreadyUsed;
