@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "517103494642",
+    "project_id": "recyclecash-2e74f",
+    "storage_bucket": "recyclecash-2e74f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517103494642:android:d8e8f07cee4a2b81a7376b",
+        "android_client_info": {
+          "package_name": "com.example.recyclecash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzfDyNa-x3zsyhZ8igWW0xIEeFdRkc0Vw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
