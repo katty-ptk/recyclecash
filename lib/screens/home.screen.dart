@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:recyclecash/services/firestore.service.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -201,7 +202,15 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Barcode Number: $barcode'),
+              SizedBox(
+                width: double.infinity,
+                height: 150,
+                child: SfBarcodeGenerator(
+                    value: barcode,
+                  showValue: true,
+                  symbology: Code128(),
+                ),
+              ),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
@@ -211,51 +220,60 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          backgroundColor: Color(0xFF36A383),
         );
       },
     );
   }
 
-  void scanBarcode(BuildContext context, List<Set<String>> userTickets) async {
+  void scanBarcode(BuildContext context, List<Set<String>> userTickets ) async {
     String barcodeScanRes;
+    String result = '';
+
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "cancel", true, ScanMode.BARCODE);
 
       String storeName = barcodeScanRes.substring(0, 4) == '2263' ? 'penny' : 'lidl';
-      String priceFromBarcode = await FirestoreService().getPriceFromBarcode(barcodeScanRes);
       String originalBarcode = storeName == 'penny' ? userTickets[1].last : userTickets[0].last;
 
-      await FirestoreService().generateBarcode(
-          storeName,
-          originalBarcode,
-          priceFromBarcode
+     result = await FirestoreService().scanBarcode(barcodeScanRes, storeName, originalBarcode);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Center(child: Text('Barcode Result')),
+            content: Text(
+              result == 'BARCODE_GOOD'
+                  ? 'Good Job on recycling! ♻️'
+                  : (
+                    result == 'BARCODE_USED'
+                      ? 'This barcode has already been scanned!'
+                      : 'You have reached the maximum amount!'
+              ),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 28,
+                  color: result == 'BARCODE_GOOD' ? Colors.green : Colors.red
+              ),
+            ),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+
+                  });
+                },
+                icon: Icon(Icons.check_circle, color: result == 'BARCODE_GOOD' ? Colors.green : Colors.red, size: 32,),
+              ),
+            ],
+          );
+        },
       );
 
     } on PlatformException {
       barcodeScanRes = "Failed to get platform version";
     }
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Barcode'),
-          content: Text('Barcode Result: $barcodeScanRes'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                setState(() {
-
-                });
-              },
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
