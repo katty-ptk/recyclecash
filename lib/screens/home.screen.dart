@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:recyclecash/screens/login.screen.dart';
 import 'package:recyclecash/services/firestore.service.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
@@ -48,15 +49,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       appBar: AppBar(
         backgroundColor: Color(0xFF595959), // Updated app bar color
+        automaticallyImplyLeading: false,
         title: Text(
           'RecycleCash',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.account_circle_sharp, color: Colors.white,),
+            icon: Icon(Icons.exit_to_app, color: Colors.white,),
             onPressed: () {
-              // Add your settings functionality here
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => LoginScreen())
+              );
             },
           ),
         ],
@@ -102,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> buildContentChildren(BuildContext context, String username, List<Set<String>> userTickets) {
     List<Widget> contentChildren = [];
 
-    contentChildren.add(_buildUsernameBox(username));
+    contentChildren.add(_buildUsernameBox(username, userTickets));
     contentChildren.add(SizedBox(height: 20.0),);
 
     userTickets.forEach((ticket) {
@@ -134,7 +138,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return contentChildren;
   }
 
-  Widget _buildUsernameBox(String username) {
+  Widget _buildUsernameBox(String username, List<Set<String>> userTickets ) {
+      // FirestoreService().getPriceFromBarcode(userTickets[0].last) + FirestoreService().getPriceFromBarcode(userTickets[1].last)
+
+    double first = double.parse(FirestoreService().getPriceFromBarcode(userTickets[0].last));
+    double second = double.parse(FirestoreService().getPriceFromBarcode(userTickets[1].last));
+
+    double sum = (first + second) / 100;
+
+    print("FIRST DOUBLE IS ==> " + first.toString());
+
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFF595959).withAlpha(60), // Updated rectangle color
@@ -154,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SizedBox(height: 20.0),
           Text(
-            'Total Balance: \$100.00',
+            'Total Balance: \$${sum.toString()}',
             style: TextStyle(fontSize: 16.0, color: Colors.white),
           ),
         ],
@@ -291,8 +304,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: <Widget>[
               IconButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop();
+
+                  await FirestoreService().moveBarcodeToScanned(barcodeScanRes, storeName);
+
                   setState(() {
 
                   });
