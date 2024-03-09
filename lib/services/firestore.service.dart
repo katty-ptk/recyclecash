@@ -117,7 +117,6 @@ class FirestoreService {
     }
 
     return res;
-
   }
 
   String getPriceFromBarcode( String barcode ) {
@@ -167,6 +166,20 @@ class FirestoreService {
     }
 
     return barcodeAlreadyUsed;
+  }
+
+  Future<void> moveBarcodeToScanned(String barcode, String storeName)  async {
+    DocumentReference<Map<String, dynamic>> storeDoc =
+    db.collection('stores').doc(storeName);
+
+    try {
+      await storeDoc.update({
+        "scannedBarcodes": FieldValue.arrayUnion([barcode])
+      });
+    } catch (error) {
+      print(error);
+    }
+
   }
 
 }
