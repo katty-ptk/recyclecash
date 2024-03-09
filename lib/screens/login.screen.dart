@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Future<void> login() async {
       // FirestoreService().getUserName();
 
-      AuthService().signInWithEmailAndPassword(_emailController.text, _passController.text);
+      AuthService().signInWithEmailAndPassword(context, _emailController.text, _passController.text);
 
       // Navigator.pushReplacement(context,
       //     MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));

@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:recyclecash/screens/home.screen.dart';
 
 class AuthService {
-  signInWithEmailAndPassword(String email, String password) async {
+  signInWithEmailAndPassword(BuildContext context, String email, String password) async {
     try {
 
       print("email is ==> " + email);
@@ -13,6 +16,12 @@ class AuthService {
 
       if ( credential.user != null ) {
         print("we have user");
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: ( BuildContext context ) => HomeScreen()
+          )
+        );
       }
 
       if (FirebaseAuth.instance.currentUser != null) {
