@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/firestore.service.dart';
 import 'home.screen.dart';
 
 class LoginScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
 
@@ -16,7 +14,7 @@ class LoginScreen extends StatelessWidget {
           MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
     }
 
-    return SafeArea(
+      return SafeArea(
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -67,7 +65,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  _inputField(BuildContext context, Function login ) {
+  _inputField(BuildContext context, Function login) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -99,7 +97,9 @@ class LoginScreen extends StatelessWidget {
         ),
         SizedBox(height: 20),
         ElevatedButton(
-          onPressed: () => login(),
+          onPressed: () {
+            login();
+          },
           style: ElevatedButton.styleFrom(
             shape: StadiumBorder(),
             padding: EdgeInsets.symmetric(vertical: 16),
