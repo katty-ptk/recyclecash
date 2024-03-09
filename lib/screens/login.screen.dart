@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:recyclecash/services/auth.service.dart';
 
 import '../services/firestore.service.dart';
 import 'home.screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController _emailController = TextEditingController();
+
+  TextEditingController _passController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
 
     Future<void> login() async {
-      FirestoreService().getUserName();
+      // FirestoreService().getUserName();
 
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
+      AuthService().signInWithEmailAndPassword(context, _emailController.text, _passController.text);
+
+      // Navigator.pushReplacement(context,
+      //     MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
     }
 
       return SafeArea(
@@ -69,7 +82,8 @@ class LoginScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
+        TextFormField(
+          controller: _emailController,
           decoration: InputDecoration(
             hintText: "Username",
             border: OutlineInputBorder(
@@ -82,7 +96,8 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
         SizedBox(height: 20),
-        TextField(
+        TextFormField(
+          controller: _passController,
           decoration: InputDecoration(
             hintText: "Password",
             border: OutlineInputBorder(

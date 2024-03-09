@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:recyclecash/screens/profile.screen.dart';
 import 'package:recyclecash/services/firestore.service.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Color(0xFFF6A383), // Updated app bar color
         title: Text(
           'RecycleCash',
@@ -56,7 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.account_circle_sharp, color: Colors.white,),
             onPressed: () {
-              // Add your settings functionality here
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => ProfileScreen(userName: userName,))
+              );
             },
           ),
         ],
