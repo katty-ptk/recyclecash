@@ -93,7 +93,7 @@ class FirestoreService {
     String prefix = barcode.substring(0, 4);
 
     if ( prefix == '2010' ) {  // lidl
-      suma = barcode.substring(5, 9);
+      suma = barcode.substring(4, 8);
     } else {
       barcode = barcode.substring(0, barcode.length - 2);
       suma = barcode.substring(barcode.length - 4);
