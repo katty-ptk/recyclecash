@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -13,14 +16,14 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           child: Container(
-            margin: EdgeInsets.all(24),
+            margin: EdgeInsets.all(screenWidth * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _header(context),
-                _inputField(context),
-                _forgotPassword(context),
-                _signup(context),
+                _header(context, screenWidth),
+                _inputField(context, screenWidth),
+                _forgotPassword(context, screenWidth),
+                _signup(context, screenWidth),
               ],
             ),
           ),
@@ -29,24 +32,25 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  _header(context) {
+  _header(context, double screenWidth) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
-          "assets/logo.png", // Replace with your image asset path
-          height: 100, // Adjust the height as needed
+          "assets/logo.png",
+          height: screenWidth * 0.2,
         ),
-        SizedBox(width: 10), // Add some space between the logo and text
+        SizedBox(width: screenWidth * 0.03),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "  Welcome to",
-              style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Color(0xFF36A383)),
+              "   Welcome to",
+              style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold, color: Color(0xFF36A383)),
             ),
             Text(
               "RecycleCash",
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Color(0xFF36A383)),
+              style: TextStyle(fontSize: screenWidth * 0.075, fontWeight: FontWeight.bold, color: Color(0xFF36A383)),
             ),
           ],
         ),
@@ -54,7 +58,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  _inputField(context) {
+  _inputField(context, double screenWidth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -62,60 +66,62 @@ class LoginScreen extends StatelessWidget {
           decoration: InputDecoration(
             hintText: "Username",
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(14), // Adjusted to screen width proportion
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFF36A383).withOpacity(0.1), // Changed box color
+            fillColor: Color(0xFF36A383).withOpacity(0.1),
             filled: true,
+            contentPadding: EdgeInsets.symmetric(vertical: screenWidth * 0.032), // Adjusted to screen width proportion
             prefixIcon: Icon(Icons.person, color: Color(0xFF595959)),
           ),
         ),
-        SizedBox(height: 20),
+        SizedBox(height: screenWidth * 0.04),
         TextField(
           decoration: InputDecoration(
             hintText: "Password",
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(14), // Adjusted to screen width proportion
               borderSide: BorderSide.none,
             ),
-            fillColor: Color(0xFF36A383).withOpacity(0.1), // Changed box color
+            fillColor: Color(0xFF36A383).withOpacity(0.1),
             filled: true,
+            contentPadding: EdgeInsets.symmetric(vertical: screenWidth * 0.032), // Adjusted to screen width proportion
             prefixIcon: Icon(Icons.lock, color: Color(0xFF595959)),
           ),
           obscureText: true,
         ),
-        SizedBox(height: 20),
+        SizedBox(height: screenWidth * 0.04),
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
             shape: StadiumBorder(),
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
           ),
           child: Text(
             "Login",
-            style: TextStyle(fontSize: 20, color: Color(0xFF595959)),
+            style: TextStyle(fontSize: screenWidth * 0.04, color: Color(0xFF595959)),
           ),
         )
       ],
     );
   }
 
-  _forgotPassword(context) {
+  _forgotPassword(context, double screenWidth) {
     return TextButton(
       onPressed: () {},
       child: Text(
         "Forgot password?",
-        style: TextStyle(fontSize: 15, color: Color(0xFF595959)),
+        style: TextStyle(fontSize: screenWidth * 0.04, color: Color(0xFF595959)),
       ),
     );
   }
 
-  _signup(context) {
+  _signup(context, double screenWidth) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Don't have an account? ", style: TextStyle(color: Color(0xFF595959))), // Added TextStyle for text color
-        TextButton(onPressed: () {}, child: Text("Sign Up", style: TextStyle(color: Color(0xFF595959)))), // Added TextStyle for text color
+        Text("Don't have an account? ", style: TextStyle(fontSize: screenWidth * 0.04, color: Color(0xFF595959))),
+        TextButton(onPressed: () {}, child: Text("Sign Up", style: TextStyle(fontSize: screenWidth * 0.04, color: Color(0xFF595959)))),
       ],
     );
   }
