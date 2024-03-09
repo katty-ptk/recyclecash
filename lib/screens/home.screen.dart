@@ -271,8 +271,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: <Widget>[
               IconButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop();
+
+                  await FirestoreService().moveBarcodeToScanned(barcodeScanRes, storeName);
+
                   setState(() {
 
                   });
