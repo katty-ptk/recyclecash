@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:recyclecash/widgets/logo.widget.dart';
-
-
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key});
@@ -9,12 +8,20 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF6D7361), // Updated background color
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/SL-051919-20420-09.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _buildContent(context),
+      ),
       appBar: AppBar(
-        backgroundColor: Color(0xFF989F7E), // Updated app bar color
+        backgroundColor: Color(0xFFF6A383), // Updated app bar color
         title: Text(
-          'Flutter App',
-          style: TextStyle(color: Colors.black), // Updated title color
+          'RecycleCash',
+          style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -27,64 +34,60 @@ class HomeScreen extends StatelessWidget {
         elevation: 5.0,
         shadowColor: Colors.black,
       ),
-      body: Padding(
+      floatingActionButton: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFFC0C7AB), // Updated rectangle color
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Username',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10.0),
-                    Text(
-                      'Total Balance: \$100.00', // Replace with actual balance
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.0),
-              _buildSupermarketBox(context, 'Supermarket Name 1'),
-              SizedBox(height: 20.0),
-              _buildSupermarketBox(context, 'Supermarket Name 2'),
-              SizedBox(height: 20.0),
-              _buildSupermarketBox(context, 'Supermarket Name 3'),
-              SizedBox(height: 20.0),
-              _buildSupermarketBox(context, 'Supermarket Name 4'), // Added another supermarket box
-            ],
+        child: ElevatedButton(
+          onPressed: () {
+            // Call your barcode scanning function here
+            scanBarcode(context);
+          },
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(20.0), // Adjust padding to make the button bigger
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(60.0), // Make the button round
+            ),
+            backgroundColor: Color(0xFFF6A383), // Add shade to the button
+            elevation: 8.0,
+            shadowColor: Color(0xFFEB7749),// Adjust the elevation as needed
           ),
+          child: Icon(Icons.camera_alt, size: 40.0, color: Colors.white), // Adjust size to make the icon bigger
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Add your scan button functionality here
-        },
-        label: Text('SCAN', style: TextStyle(color: Colors.black)), // Updated button text color
-        backgroundColor: Color(0xFFC0C7AB), // Updated button color
-        icon: Icon(Icons.camera_alt),
-      ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  Widget _buildSupermarketBox(BuildContext context, String supermarketName) {
+  Widget _buildContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildUsernameBox(),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 1'),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 2'),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 3'),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 4'),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 5'),
+            SizedBox(height: 20.0),
+            _buildShadowedSupermarketBox(context, 'Supermarket Name 6'), // Added another supermarket box
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsernameBox() {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFB6AD90), // Updated rectangle color
+        color: Color(0xFFF6A383), // Updated rectangle color
         borderRadius: BorderRadius.circular(10.0),
       ),
       padding: EdgeInsets.all(20.0),
@@ -92,26 +95,63 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            supermarketName,
+            'Username',
             style: TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
           SizedBox(height: 10.0),
           Text(
-            'Balance: \$50.00', // Replace with actual balance
-            style: TextStyle(fontSize: 16.0),
-          ),
-          SizedBox(height: 10.0),
-          ElevatedButton(
-            onPressed: () {
-              // Add your barcode generation functionality here
-              _showBarcodeDialog(context);
-            },
-            child: Text('Generate Barcode', style: TextStyle(color: Colors.black)), // Updated button text color
+            'Total Balance: \$100.00',
+            style: TextStyle(fontSize: 16.0, color: Colors.white),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShadowedSupermarketBox(BuildContext context, String supermarketName) {
+    return Card(
+      elevation: 10.0, // Shadow effect elevation
+      shadowColor: Color(0xFF2E9A7A), // Shadow color
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF36A383), // Updated rectangle color
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        padding: EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              supermarketName,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 0.0),
+            Text(
+              'Balance: \$50.00',
+              style: TextStyle(fontSize: 16.0, color: Colors.white),
+            ),
+            SizedBox(height: 10.0),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  _showBarcodeDialog(context);
+                },
+                child: Text('Generate Barcode', style: TextStyle(color: Colors.black)),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -126,21 +166,47 @@ class HomeScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Barcode Number: 1234567890'), // Replace with actual barcode number
+              Text('Barcode Number: 1234567890'),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('Close', style: TextStyle(color: Colors.black)), // Updated button text color
+                child: Text('Close', style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
-          backgroundColor: Color(0xFFC0C7AB), // Updated dialog background color
+          backgroundColor: Color(0xFF36A383),
+        );
+      },
+    );
+  }
+
+  void scanBarcode(BuildContext context) async {
+    String barcodeScanRes;
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "cancel", true, ScanMode.BARCODE);
+    } on PlatformException {
+      barcodeScanRes = "Failed to get platform version";
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Barcode'),
+          content: Text('Barcode Result: $barcodeScanRes'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
         );
       },
     );
   }
 }
-
-
