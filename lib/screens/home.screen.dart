@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Color(0xFFF6A383), // Updated app bar color
         title: Text(
           'RecycleCash',
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.account_circle_sharp, color: Colors.white,),
             onPressed: () {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => ProfileScreen())
+                MaterialPageRoute(builder: (context) => ProfileScreen(userName: userName,))
               );
             },
           ),

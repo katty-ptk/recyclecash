@@ -41,6 +41,7 @@ dependencies:
   cloud_firestore: ^4.15.8
   shared_preferences: ^2.2.2
   syncfusion_flutter_barcodes: ^24.2.9
+  firebase_auth: ^4.17.8
 
 dev_dependencies:
   flutter_test:
