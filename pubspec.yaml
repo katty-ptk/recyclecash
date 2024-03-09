@@ -34,6 +34,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+
   cupertino_icons: ^1.0.2
   simple_barcode_scanner: ^0.0.8
   firebase_core: ^2.27.0
@@ -59,6 +60,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/SL-051919-20420-09.jpg
+    - assets/logo.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
