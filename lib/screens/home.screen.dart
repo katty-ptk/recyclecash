@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-    @override
+  @override
   Widget build(BuildContext context) {
 
     String userName = '';
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       appBar: AppBar(
-        backgroundColor: Color(0xFFF6A383), // Updated app bar color
+        backgroundColor: Color(0xFF595959), // Updated app bar color
         title: Text(
           'RecycleCash',
           style: TextStyle(color: Colors.white),
@@ -75,9 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(60.0), // Make the button round
             ),
-            backgroundColor: Color(0xFFF6A383), // Add shade to the button
+            backgroundColor: Color(0xFF595959), // Add shade to the button
             elevation: 8.0,
-            shadowColor: Color(0xFFEB7749),// Adjust the elevation as needed
+            shadowColor: Color(0xFF595959),// Adjust the elevation as needed
           ),
           child: Icon(Icons.camera_alt, size: 40.0, color: Colors.white), // Adjust size to make the icon bigger
         ),
@@ -109,9 +109,27 @@ class _HomeScreenState extends State<HomeScreen> {
       String balance = FirestoreService().getPriceFromBarcode(ticket.last);
 
       contentChildren.add(
-      _buildShadowedSupermarketBox(context, ticket.first, double.parse(balance)),
+        _buildShadowedSupermarketBox(context, ticket.first, double.parse(balance), 'assets/${ticket.first}.jpg'),
+
       );
     });
+
+    contentChildren.add(
+      _buildShadowedSupermarketBox(context, 'Profi', double.parse('0.0'), 'assets/profi.jpg'),
+
+    );
+
+    contentChildren.add(
+      _buildShadowedSupermarketBox(context, 'Mega Image', double.parse('0.0'), 'assets/megaimage.jpg'),
+    );
+
+    contentChildren.add(
+      _buildShadowedSupermarketBox(context, 'Carrefour', double.parse('0.0'), 'assets/carrefour.jpg'),
+    );
+
+    contentChildren.add(
+      _buildShadowedSupermarketBox(context, 'Kaufland', double.parse('0.0'), 'assets/kaufland.jpg'),
+    );
 
     return contentChildren;
   }
@@ -119,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildUsernameBox(String username) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xFFF6A383), // Updated rectangle color
+        color: Color(0xFF595959).withAlpha(60), // Updated rectangle color
         borderRadius: BorderRadius.circular(10.0),
       ),
       padding: EdgeInsets.all(20.0),
@@ -134,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
           ),
-          SizedBox(height: 10.0),
+          SizedBox(height: 20.0),
           Text(
             'Total Balance: \$100.00',
             style: TextStyle(fontSize: 16.0, color: Colors.white),
@@ -144,49 +162,64 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShadowedSupermarketBox(BuildContext context, String supermarketName, double balance) {
+  Widget _buildShadowedSupermarketBox(BuildContext context, String supermarketName, double balance, String imagePath) {
     return Card(
+      margin: EdgeInsets.symmetric(vertical: 15),
       elevation: 10.0, // Shadow effect elevation
-      shadowColor: Color(0xFF2E9A7A), // Shadow color
+      shadowColor: Color(0xFF2E9A7A).withAlpha(50), // Shadow color
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF36A383), // Updated rectangle color
+          color: Color(0xFF36A383).withAlpha(50), // Updated rectangle color
           borderRadius: BorderRadius.circular(10.0),
         ),
         padding: EdgeInsets.all(10.0),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              supermarketName,
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    supermarketName.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Text(
+                    'Balance: \$${(balance / 100).toString()}',
+                    style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  ),
+                  SizedBox(height: 20.0),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showBarcodeDialog(context, supermarketName);
+                      },
+                      child: Text('Generate Barcode', style: TextStyle(color: Colors.black)),
+                    ),
+                  )
+                ],
               ),
             ),
-            SizedBox(height: 0.0),
-            Text(
-              'Balance: \$${(balance/100).toString()}',
-              style: TextStyle(fontSize: 16.0, color: Colors.white),
+            SizedBox(width: 10), // Add some spacing between supermarket name and image
+            Image.asset(
+              imagePath,
+              width: 100, // Adjust the width of the image
+              height: 100, // Adjust the height of the image
             ),
-            SizedBox(height: 10.0),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  _showBarcodeDialog(context, supermarketName);
-                },
-                child: Text('Generate Barcode', style: TextStyle(color: Colors.black)),
-              ),
-            )
           ],
         ),
       ),
     );
   }
+
 
   Future<void> _showBarcodeDialog(BuildContext context, String storeName) async {
     List<Set<String>> userTickets = await FirestoreService().getUserTickets();
@@ -205,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 height: 150,
                 child: SfBarcodeGenerator(
-                    value: barcode,
+                  value: barcode,
                   showValue: true,
                   symbology: Code128(),
                 ),
@@ -235,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
       String storeName = barcodeScanRes.substring(0, 4) == '2263' ? 'penny' : 'lidl';
       String originalBarcode = storeName == 'penny' ? userTickets[1].last : userTickets[0].last;
 
-     result = await FirestoreService().scanBarcode(barcodeScanRes, storeName, originalBarcode);
+      result = await FirestoreService().scanBarcode(barcodeScanRes, storeName, originalBarcode);
 
       showDialog(
         context: context,
@@ -246,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
               result == 'BARCODE_GOOD'
                   ? 'Good Job on recycling! ♻️'
                   : (
-                    result == 'BARCODE_USED'
+                  result == 'BARCODE_USED'
                       ? 'This barcode has already been scanned!'
                       : 'You have reached the maximum amount!'
               ),

@@ -61,6 +61,12 @@ flutter:
   assets:
     - assets/SL-051919-20420-09.jpg
     - assets/logo.png
+    - assets/lidl.jpg
+    - assets/penny.jpg
+    - assets/carrefour.jpg
+    - assets/megaimage.jpg
+    - assets/kaufland.jpg
+    - assets/profi.jpg
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
