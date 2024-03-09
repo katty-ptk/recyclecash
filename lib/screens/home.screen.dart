@@ -1,21 +1,50 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:recyclecash/services/firestore.service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
+
+    String userName = '';
+    List<Set<String>> userTickets = [];
+
+    Future<void> getData() async {
+      userName = await FirestoreService().getUserName();
+      userTickets = await FirestoreService().getUserTickets();
+    }
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/SL-051919-20420-09.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: _buildContent(context),
+      body: FutureBuilder(
+        future: getData(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if ( snapshot.connectionState == ConnectionState.waiting ) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if ( snapshot.connectionState == ConnectionState.done ){
+            return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/SL-051919-20420-09.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: _buildContent(context, userName, userTickets),
+            );
+          }
+
+          return CircularProgressIndicator();
+        },
       ),
       appBar: AppBar(
         backgroundColor: Color(0xFFF6A383), // Updated app bar color
@@ -39,7 +68,7 @@ class HomeScreen extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () {
             // Call your barcode scanning function here
-            scanBarcode(context);
+            scanBarcode(context, userTickets);
           },
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.all(20.0), // Adjust padding to make the button bigger
@@ -58,33 +87,36 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, String username, List<Set<String>> userTickets) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildUsernameBox(),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 1'),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 2'),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 3'),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 4'),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 5'),
-            SizedBox(height: 20.0),
-            _buildShadowedSupermarketBox(context, 'Supermarket Name 6'), // Added another supermarket box
-          ],
+          children: buildContentChildren(context, username, userTickets),
         ),
       ),
     );
   }
 
-  Widget _buildUsernameBox() {
+  List<Widget> buildContentChildren(BuildContext context, String username, List<Set<String>> userTickets) {
+    List<Widget> contentChildren = [];
+
+    contentChildren.add(_buildUsernameBox(username));
+    contentChildren.add(SizedBox(height: 20.0),);
+
+    userTickets.forEach((ticket) {
+      String balance = FirestoreService().getPriceFromBarcode(ticket.last);
+
+      contentChildren.add(
+      _buildShadowedSupermarketBox(context, ticket.first, double.parse(balance)),
+      );
+    });
+
+    return contentChildren;
+  }
+
+  Widget _buildUsernameBox(String username) {
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFFF6A383), // Updated rectangle color
@@ -95,7 +127,7 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Username',
+            '$username',
             style: TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
@@ -112,7 +144,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShadowedSupermarketBox(BuildContext context, String supermarketName) {
+  Widget _buildShadowedSupermarketBox(BuildContext context, String supermarketName, double balance) {
     return Card(
       elevation: 10.0, // Shadow effect elevation
       shadowColor: Color(0xFF2E9A7A), // Shadow color
@@ -138,14 +170,14 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 0.0),
             Text(
-              'Balance: \$50.00',
+              'Balance: \$${(balance/100).toString()}',
               style: TextStyle(fontSize: 16.0, color: Colors.white),
             ),
             SizedBox(height: 10.0),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _showBarcodeDialog(context);
+                  _showBarcodeDialog(context, supermarketName);
                 },
                 child: Text('Generate Barcode', style: TextStyle(color: Colors.black)),
               ),
@@ -156,7 +188,10 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showBarcodeDialog(BuildContext context) async {
+  Future<void> _showBarcodeDialog(BuildContext context, String storeName) async {
+    List<Set<String>> userTickets = await FirestoreService().getUserTickets();
+    String barcode = storeName == 'lidl' ? userTickets[0].last : userTickets[1].last;
+
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -166,7 +201,7 @@ class HomeScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Barcode Number: 1234567890'),
+              Text('Barcode Number: $barcode'),
               SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
@@ -182,11 +217,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void scanBarcode(BuildContext context) async {
+  void scanBarcode(BuildContext context, List<Set<String>> userTickets) async {
     String barcodeScanRes;
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "cancel", true, ScanMode.BARCODE);
+
+      String storeName = barcodeScanRes.substring(0, 4) == '2263' ? 'penny' : 'lidl';
+      String priceFromBarcode = await FirestoreService().getPriceFromBarcode(barcodeScanRes);
+      String originalBarcode = storeName == 'penny' ? userTickets[1].last : userTickets[0].last;
+
+      await FirestoreService().generateBarcode(
+          storeName,
+          originalBarcode,
+          priceFromBarcode
+      );
+
     } on PlatformException {
       barcodeScanRes = "Failed to get platform version";
     }
@@ -201,6 +247,9 @@ class HomeScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                setState(() {
+
+                });
               },
               child: Text('Close'),
             ),
