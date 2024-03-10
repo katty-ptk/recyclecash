@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             '$username',
             style: TextStyle(
-              fontSize: 18.0,
+              fontSize: 24.0,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Barcode'),
+          title: Text('Barcode', textAlign: TextAlign.center,),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -258,8 +258,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop();
+
+                  await FirestoreService().undoBarcode(storeName);
+
+                  setState(() {
+
+                  });
                 },
                 child: Text('Close', style: TextStyle(color: Colors.black)),
               ),

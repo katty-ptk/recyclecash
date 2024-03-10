@@ -119,16 +119,12 @@ class FirestoreService {
     return res;
   }
 
-  String getPriceFromBarcode( String barcode ) {
+  String getPriceFromBarcode( String barcode) {
     String suma = '';
     String prefix = barcode.substring(0, 4);
 
     if ( prefix == '2010' ) {  // lidl
-      suma = barcode.substring(4, 8); // 201000002000000264203810
-
-      // if ( suma[suma.length -2 ] == '2' ){
-      //   suma = barcode.substring(3, 6);
-      // }
+        suma = barcode.substring(4, 8);
     } else {
       barcode = barcode.substring(0, barcode.length - 2);
       suma = barcode.substring(barcode.length - 4);
@@ -180,6 +176,29 @@ class FirestoreService {
       print(error);
     }
 
+  }
+
+  Future<void> undoBarcode(String storeName) async {
+    DocumentReference<Map<String, dynamic>> userDoc =
+    db.collection('users').doc('Osbm2OzwhYVd5fPFsWnHudTPezX2');
+
+    String barcode = '';
+
+    if ( storeName == 'lidl' ) {
+      barcode = '20101000000000264203810';
+    } else {
+        barcode = '226300045091001920000000';
+    }
+
+    try {
+      print("sunt in try");
+
+      await userDoc.update({
+        storeName: barcode
+      });
+    } catch (error) {
+      print(error);
+    }
   }
 
 }
