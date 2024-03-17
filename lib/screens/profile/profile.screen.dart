@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:recyclecash/screens/home.screen.dart';
-import 'package:recyclecash/screens/login.screen.dart';
+import 'package:recyclecash/screens/home/home.screen.dart';
+import 'package:recyclecash/screens/login/login.screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String userName;

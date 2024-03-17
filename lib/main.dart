@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:recyclecash/firebase_options.dart';
-import 'package:recyclecash/screens/home.screen.dart';
-import 'package:recyclecash/screens/login.screen.dart';
+import 'package:recyclecash/screens/home/home.screen.dart';
+import 'package:recyclecash/screens/login/login.screen.dart';
+import 'package:recyclecash/services/auth.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -12,14 +13,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform
   );
 
-  bool isLoggedIn;
-  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-  if ( sharedPreferences.getString('tickets') != null ) {
-    isLoggedIn = true;
-  } else {
-    isLoggedIn = false;
-  }
+  bool isLoggedIn = await AuthService().isLoggedIn();
 
   runApp(MyApp(isLoggedIn: isLoggedIn,));
 }
