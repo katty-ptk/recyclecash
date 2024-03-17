@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recyclecash/services/auth.service.dart';
 
-import '../services/firestore.service.dart';
-import 'home.screen.dart';
+import '../../services/firestore.service.dart';
+import '../home/home.screen.dart';
 
 class LoginScreen extends StatefulWidget {
 
@@ -21,7 +21,14 @@ class _LoginScreenState extends State<LoginScreen> {
     Future<void> login() async {
       // FirestoreService().getUserName();
 
-      AuthService().signInWithEmailAndPassword(context, _emailController.text, _passController.text);
+      bool signedInSuccessfully = await AuthService().signInWithEmailAndPassword(context, _emailController.text, _passController.text);
+      if ( signedInSuccessfully ) {
+        Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: ( BuildContext context ) => const HomeScreen()
+            )
+        );
+      }
 
       // Navigator.pushReplacement(context,
       //     MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
@@ -30,14 +37,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return SafeArea(
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/SL-051919-20420-09.jpg"),
               fit: BoxFit.cover,
             ),
           ),
           child: Container(
-            margin: EdgeInsets.all(24),
+            margin: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -58,10 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Image.asset(
           "assets/logo.png", // Replace with your image asset path
-          height: 100, // Adjust the height as needed
+          height: 90, // Adjust the height as needed
         ),
-        SizedBox(width: 10), // Add some space between the logo and text
-        Column(
+        const SizedBox(width: 10), // Add some space between the logo and text
+        const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
