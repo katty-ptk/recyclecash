@@ -113,7 +113,7 @@ class HomeScreen extends StatelessWidget {
     );
 
     for (var ticket in userTickets) {
-      // String balance = FirestoreService().getPriceFromBarcode(ticket);
+      //String balance = FirestoreService().getPriceFromBarcode(ticket);
       String balance = "${ticket.price}";
 
       contentChildren.add(
@@ -127,51 +127,6 @@ class HomeScreen extends StatelessWidget {
         ),
       );
     }
-
-    contentChildren.add(
-      _buildShadowedSupermarketBox(
-        context,
-        Barcode.dummyBarcode('Profi'),
-        0.0,
-        'assets/profi.jpg',
-        userTickets,
-        undoBarcode,
-      ),
-    );
-
-    contentChildren.add(
-      _buildShadowedSupermarketBox(
-        context,
-        Barcode.dummyBarcode('Mega Image'),
-        0.0,
-        'assets/megaimage.jpg',
-        userTickets,
-        undoBarcode,
-      ),
-    );
-
-    contentChildren.add(
-      _buildShadowedSupermarketBox(
-        context,
-        Barcode.dummyBarcode('Carrefour'),
-        0.0,
-        'assets/carrefour.jpg',
-        userTickets,
-        undoBarcode,
-      ),
-    );
-
-    contentChildren.add(
-      _buildShadowedSupermarketBox(
-        context,
-        Barcode.dummyBarcode('Kaufland'),
-        0.0,
-        'assets/kaufland.jpg',
-        userTickets,
-        undoBarcode,
-      ),
-    );
-
     return contentChildren;
   }
 
@@ -184,8 +139,12 @@ class HomeScreen extends StatelessWidget {
     //     FirestoreService().getPriceFromBarcode(userTickets[1].last));
     int first = userTickets[0].price;
     int second = userTickets[1].price;
+    int third = userTickets[2].price;
+    int fourth = userTickets[3].price;
+    int fifth = userTickets[4].price;
+    int sixth = userTickets[5].price;
 
-    double sum = (first + second) / 100;
+    double sum = (first + second + third + fourth + fifth + sixth) / 100;
 
     print("FIRST DOUBLE IS ==> " + first.toString());
 
@@ -347,15 +306,15 @@ class HomeScreen extends StatelessWidget {
           barcodeScanRes.substring(0, 4) == '2263' ? 'penny' : 'lidl';
       Barcode originalBarcode = userTickets.firstWhere(
         (element) => element.store.toString() == storeName,
-        orElse: () => Barcode(
-          barcode: barcodeScanRes,
-          store: BarcodeStore.fromString(storeName),
-        ),
+        //orElse: () => Barcode(
+          //barcode: barcodeScanRes,
+          //store: BarcodeStore.fromString(storeName),
+        //),
       );
       // storeName == 'penny' ? userTickets[1].last : userTickets[0].last;
 
       // result = await FirestoreService()
-      //     .scanBarcode(barcodeScanRes, storeName, originalBarcode);
+         //  .scanBarcode(barcodeScanRes, storeName, originalBarcode);
       result = await barcodeScanned(barcodeScanRes, storeName, originalBarcode);
 
       showDialog(

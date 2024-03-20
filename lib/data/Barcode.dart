@@ -3,8 +3,9 @@ enum BarcodeStore {
   lidl,
   kaufland,
   profi,
-  megaImage,
+  megaimage,
   carrefour,
+  penny,
   undefined;
 
   static BarcodeStore fromString(String  storeName) {
@@ -15,10 +16,12 @@ enum BarcodeStore {
         return BarcodeStore.kaufland;
       case 'profi':
         return BarcodeStore.profi;
-      case 'megaImage':
-        return BarcodeStore.megaImage;
+      case 'megaimage':
+        return BarcodeStore.megaimage;
       case 'carrefour':
         return BarcodeStore.carrefour;
+      case 'penny':
+        return BarcodeStore.penny;
       default:
         return BarcodeStore.undefined;
     }
@@ -32,10 +35,12 @@ enum BarcodeStore {
         return 'kaufland';
       case BarcodeStore.profi:
         return 'profi';
-      case BarcodeStore.megaImage:
-        return 'megaImage';
+      case BarcodeStore.megaimage:
+        return 'megaimage';
       case BarcodeStore.carrefour:
         return 'carrefour';
+      case BarcodeStore.penny:
+        return 'penny';
       default:
         return 'undefined';
     }
@@ -53,7 +58,7 @@ class Barcode {
       price = int.parse(barcode.substring(4, 8));
       store = BarcodeStore.lidl;
     } else {
-      // barcode = barcode.substring(0, barcode.length - 2);
+       //barcode = barcode.substring(0, barcode.length - 2);
       price = int.parse(barcode.substring(barcode.length - 4));
     }
   }
