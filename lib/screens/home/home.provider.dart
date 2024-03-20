@@ -86,7 +86,7 @@ class HomeProvider extends ChangeNotifier {
       } else if (storeName == 'lidl') {
         newBarcode = '2010${suma}2000000264203810';
       }
-      await _firestoreService.saveBarCode(userId, newBarcode);
+      await _firestoreService.updateBarcode(userId,storeName, newBarcode);
     }
 
     return maxAmount;

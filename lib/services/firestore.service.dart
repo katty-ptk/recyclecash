@@ -120,7 +120,7 @@ class FirestoreService {
     String barcode = '';
 
     if ( storeName == 'lidl' ) {
-      barcode = '20101000000000264203810';
+      barcode = '20100000000000264203810';
     } else {
         barcode = '226300045091001920000000';
     }
@@ -133,6 +133,19 @@ class FirestoreService {
       });
     } catch (error) {
       print(error);
+    }
+  }
+
+  Future<void> updateBarcode(String userId, String storeName, String newBarcode) async {
+    DocumentReference<Map<String, dynamic>> userDoc = db.collection('users').doc(userId);
+
+    try {
+      await userDoc.update({
+        storeName: newBarcode
+      });
+    } catch (error) {
+      print(error);
+      // Handle error
     }
   }
 
