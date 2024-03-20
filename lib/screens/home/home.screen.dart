@@ -222,7 +222,7 @@ class HomeScreen extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showBarcodeDialog(context, barcode, undoBarcode);
+                        _BarcodesDialog(context, barcode, undoBarcode);
                       },
                       child: const Text('Generate Barcode',
                           style: TextStyle(color: Colors.black)),
@@ -285,6 +285,69 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _BarcodesDialog(
+      BuildContext context,
+      Barcode barcode,
+      Function(Barcode) undoBarcode,
+      ) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Barcodes',
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            width: double.maxFinite,
+            height: 400,
+            child: ListView.builder(
+              itemCount: 5,
+              scrollDirection: Axis.vertical,
+              physics: const ClampingScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.only(left: index == 0 ? 10 : 5, right: index == 4 ? 10 : 5),
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Barcode ${index + 1}',
+                            style: const TextStyle(fontSize: 14, color: Colors.black)),
+                        const SizedBox(height: 10),
+                        SfBarcodeGenerator(
+                          value: 'barcode ${index + 1}',
+                          showValue: false,
+                          symbology: Code128(),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  _showBarcodeDialog(context, barcode, undoBarcode);
+                },
+                child: const Text('Generate Barcode', style: TextStyle(color: Colors.black)),
+              ),
+            )
+          ],
         );
       },
     );
