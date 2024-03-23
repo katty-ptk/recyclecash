@@ -137,16 +137,18 @@ class HomeScreen extends StatelessWidget {
     //     FirestoreService().getPriceFromBarcode(userTickets[0].last));
     // double second = double.parse(
     //     FirestoreService().getPriceFromBarcode(userTickets[1].last));
-    int first = userTickets[0].price;
-    int second = userTickets[1].price;
-    int third = userTickets[2].price;
-    int fourth = userTickets[3].price;
-    int fifth = userTickets[4].price;
-    int sixth = userTickets[5].price;
-
-    double sum = (first + second + third + fourth + fifth + sixth) / 100;
-
-    print("FIRST DOUBLE IS ==> " + first.toString());
+    // int first = userTickets[0].price;
+    // int second = userTickets[1].price;
+    // int third = userTickets[2].price;
+    // int fourth = userTickets[3].price;
+    // int fifth = userTickets[4].price;
+    // int sixth = userTickets[5].price;
+    //
+    // double sum = (first + second + third + fourth + fifth + sixth) / 100;
+    double sum = 0;
+    for (var element in userTickets) {
+      sum += element.price;
+    }
 
     return Container(
       decoration: BoxDecoration(

@@ -7,10 +7,10 @@ class FirestoreService {
 
   Future<String> getUserName(String userId) async {
     DocumentReference<Map<String, dynamic>> userDoc =
-    db.collection('users').doc(userId);
+        db.collection('users').doc(userId);
 
     final SharedPreferences sharedPreferences =
-    await SharedPreferences.getInstance();
+        await SharedPreferences.getInstance();
     String userName = '';
 
     try {
@@ -28,9 +28,8 @@ class FirestoreService {
   }
 
   Future<List<Barcode>> getUserTickets(String userID) async {
-
     DocumentReference<Map<String, dynamic>> userDoc =
-    db.collection('users').doc(userID);
+        db.collection('users').doc(userID);
 
     List<Barcode> userTickets = [];
 
@@ -39,11 +38,10 @@ class FirestoreService {
       final userData = user.data();
 
       userData?.entries.forEach((entry) {
-        if ( entry.key != 'name' ) {
+        if (entry.key != 'name') {
           userTickets.add(Barcode.fromEntry(entry.key, entry.value));
         }
       });
-
     } catch (error) {
       print(error);
     }
@@ -53,14 +51,12 @@ class FirestoreService {
     return userTickets;
   }
 
-  Future<bool> saveBarCode(String userId, String storeName ) async {
+  Future<bool> saveBarCode(String userId, String storeName) async {
     DocumentReference<Map<String, dynamic>> userDoc =
-    db.collection('users').doc(userId);
+        db.collection('users').doc(userId);
 
     try {
-      userDoc.update({
-        storeName: storeName
-      });
+      userDoc.update({storeName: storeName});
     } catch (error) {
       print(error);
       return false;
@@ -68,11 +64,12 @@ class FirestoreService {
     return true;
   }
 
-  Future<bool> checkIfBarcodeWasAlreadyUsed(String storeName, String barcode) async{
+  Future<bool> checkIfBarcodeWasAlreadyUsed(
+      String storeName, String barcode) async {
     bool barcodeAlreadyUsed = false;
 
     DocumentReference<Map<String, dynamic>> storeDoc =
-    db.collection('stores').doc(storeName);
+        db.collection('stores').doc(storeName);
 
     try {
       final store = await storeDoc.get();
@@ -82,11 +79,11 @@ class FirestoreService {
         print("BARCODE ==> " + barcode);
         print("SCANNED BARCODES ==> " + element.value.toString());
 
-        List<dynamic> values =  element.value;
+        List<dynamic> values = element.value;
         values.forEach((element) {
           print("ELEMEnT IS " + element);
 
-          if ( element == barcode ) {
+          if (element == barcode) {
             print("barcode $barcode is already used");
             barcodeAlreadyUsed = true;
           }
@@ -99,9 +96,9 @@ class FirestoreService {
     return barcodeAlreadyUsed;
   }
 
-  Future<void> moveBarcodeToScanned(String barcode, String storeName)  async {
+  Future<void> moveBarcodeToScanned(String barcode, String storeName) async {
     DocumentReference<Map<String, dynamic>> storeDoc =
-    db.collection('stores').doc(storeName);
+        db.collection('stores').doc(storeName);
 
     try {
       await storeDoc.update({
@@ -110,43 +107,39 @@ class FirestoreService {
     } catch (error) {
       print(error);
     }
-
   }
 
   Future<void> undoBarcode(String userId, String storeName) async {
     DocumentReference<Map<String, dynamic>> userDoc =
-    db.collection('users').doc(userId);
+        db.collection('users').doc(userId);
 
     String barcode = '';
 
-    if ( storeName == 'lidl' ) {
+    if (storeName == 'lidl') {
       barcode = '20100000000000264203810';
     } else {
-        barcode = '226300045091001920000000';
+      barcode = '226300045091001920000000';
     }
 
     try {
       print("sunt in try");
 
-      await userDoc.update({
-        storeName: barcode
-      });
+      await userDoc.update({storeName: barcode});
     } catch (error) {
       print(error);
     }
   }
 
-  Future<void> updateBarcode(String userId, String storeName, String newBarcode) async {
-    DocumentReference<Map<String, dynamic>> userDoc = db.collection('users').doc(userId);
+  Future<void> updateBarcode(
+      String userId, String storeName, String newBarcode) async {
+    DocumentReference<Map<String, dynamic>> userDoc =
+        db.collection('users').doc(userId);
 
     try {
-      await userDoc.update({
-        storeName: newBarcode
-      });
+      await userDoc.update({storeName: newBarcode});
     } catch (error) {
       print(error);
       // Handle error
     }
   }
-
 }

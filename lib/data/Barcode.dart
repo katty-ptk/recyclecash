@@ -63,8 +63,12 @@ class Barcode {
     }
   }
 
-  static Barcode fromEntry(String key, value) {
-    return Barcode(barcode: value, store: BarcodeStore.fromString(key));
+  static Barcode fromEntry(String key, Map<String, dynamic> value) {
+    return Barcode(
+        barcode: value["barcode"],
+        store: BarcodeStore.fromString(value["store"]),
+        price: value["price"]
+    );
   }
 
   static Barcode dummyBarcode(String storeName) {
