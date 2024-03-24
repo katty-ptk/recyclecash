@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:recyclecash/data/Barcode.dart';
 import 'package:recyclecash/screens/home/home.provider.dart';
+import 'package:recyclecash/screens/home/uiStoreBarcode.dart';
 import 'package:recyclecash/screens/login/login.screen.dart';
 import 'package:recyclecash/services/auth.service.dart';
 import 'package:recyclecash/services/firestore.service.dart';
@@ -57,7 +59,7 @@ class HomeScreen extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () {
             // Call your barcode scanning function here
-            scanBarcode(context, state.userTickets, state.barcodeScanned);
+            scanBarcode(context, state.uiBarcodes, state.barcodeScanned);
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(20.0),
@@ -84,7 +86,7 @@ class HomeScreen extends StatelessWidget {
   Widget _buildContent(
     BuildContext context,
     String username,
-    List<Barcode> userTickets,
+    List<UiStoreBarcode> userTickets,
     Function(Barcode) undoBarcode,
   ) {
     return Padding(
@@ -102,27 +104,30 @@ class HomeScreen extends StatelessWidget {
   List<Widget> buildContentChildren(
     BuildContext context,
     String username,
-    List<Barcode> userTickets,
+    List<UiStoreBarcode> userTickets,
     Function(Barcode) undoBarcode,
   ) {
     List<Widget> contentChildren = [];
 
-    contentChildren.add(_buildUsernameBox(username, userTickets));
+    double sum = 0.0;
+    for (var element in userTickets) {
+      for (var ticket in element.allBarcodes) {
+        sum += ticket.value;
+      }
+    }
+
+    contentChildren.add(_buildUsernameBox(username, sum));
     contentChildren.add(
       const SizedBox(height: 20.0),
     );
 
     for (var ticket in userTickets) {
-      //String balance = FirestoreService().getPriceFromBarcode(ticket);
-      String balance = "${ticket.price}";
-
       contentChildren.add(
         _buildShadowedSupermarketBox(
           context,
+          ticket.storeName,
+          'assets/${ticket.storeName.toString()}.jpg',
           ticket,
-          double.parse(balance),
-          'assets/${ticket.store.toString()}.jpg',
-          userTickets,
           undoBarcode,
         ),
       );
@@ -130,26 +135,7 @@ class HomeScreen extends StatelessWidget {
     return contentChildren;
   }
 
-  Widget _buildUsernameBox(String username, List<Barcode> userTickets) {
-    // FirestoreService().getPriceFromBarcode(userTickets[0].last) + FirestoreService().getPriceFromBarcode(userTickets[1].last)
-
-    // double first = double.parse(
-    //     FirestoreService().getPriceFromBarcode(userTickets[0].last));
-    // double second = double.parse(
-    //     FirestoreService().getPriceFromBarcode(userTickets[1].last));
-    // int first = userTickets[0].price;
-    // int second = userTickets[1].price;
-    // int third = userTickets[2].price;
-    // int fourth = userTickets[3].price;
-    // int fifth = userTickets[4].price;
-    // int sixth = userTickets[5].price;
-    //
-    // double sum = (first + second + third + fourth + fifth + sixth) / 100;
-    double sum = 0;
-    for (var element in userTickets) {
-      sum += element.price;
-    }
-
+  Widget _buildUsernameBox(String username, double sum) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF595959).withAlpha(60), // Updated rectangle color
@@ -179,12 +165,16 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildShadowedSupermarketBox(
     BuildContext context,
-    Barcode barcode,
-    double balance,
+    String storename,
     String imagePath,
-    List<Barcode> userTickets,
+    UiStoreBarcode userTicket,
     Function(Barcode) undoBarcode,
   ) {
+    double balance = 0;
+    for (var ticket in userTicket.allBarcodes) {
+      balance += ticket.value;
+    }
+
     return Card(
       margin: EdgeInsets.symmetric(vertical: 15),
       elevation: 10.0,
@@ -208,7 +198,7 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    barcode.store.toString().toUpperCase(),
+                    storename.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -217,14 +207,18 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10.0),
                   Text(
-                    'Balance: \$${(balance / 100).toString()}',
+                    'Balance: \$${(balance).toString()}',
                     style: const TextStyle(fontSize: 16.0, color: Colors.white),
                   ),
                   const SizedBox(height: 20.0),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        _BarcodesDialog(context, barcode, undoBarcode);
+                        _BarcodesDialog(
+                          context,
+                          userTicket,
+                          undoBarcode,
+                        );
                       },
                       child: const Text('Generate Barcode',
                           style: TextStyle(color: Colors.black)),
@@ -251,9 +245,6 @@ class HomeScreen extends StatelessWidget {
     Barcode barcode,
     Function(Barcode) undoBarcode,
   ) async {
-    // List<Set<String>> userTickets =
-    //     await FirestoreService().getUserTickets('Osbm2OzwhYVd5fPFsWnHudTPezX2');
-
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -293,10 +284,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   Future<void> _BarcodesDialog(
-      BuildContext context,
-      Barcode barcode,
-      Function(Barcode) undoBarcode,
-      ) async {
+    BuildContext context,
+    UiStoreBarcode barcode,
+    Function(Barcode) undoBarcode,
+  ) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -307,14 +298,20 @@ class HomeScreen extends StatelessWidget {
           ),
           content: Container(
             width: double.maxFinite,
-            height: 400,
+            height: barcode.allBarcodes.length > 4
+                ? 440
+                : barcode.allBarcodes.length * 110,
             child: ListView.builder(
-              itemCount: 5,
+              itemCount: barcode.allBarcodes.length,
               scrollDirection: Axis.vertical,
               physics: const ClampingScrollPhysics(),
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: EdgeInsets.only(left: index == 0 ? 10 : 5, right: index == 4 ? 10 : 5),
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? 10 : 5,
+                    right: index == 4 ? 10 : 5,
+                    top: 10
+                  ),
                   child: Container(
                     width: 100,
                     height: 100,
@@ -325,13 +322,17 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Barcode ${index + 1}',
-                            style: const TextStyle(fontSize: 14, color: Colors.black)),
+                        Text(DateFormat('yyyy-MM-dd – kk:mm').format(barcode.allBarcodes[index].scanDate.toDate()),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black)),
                         const SizedBox(height: 10),
-                        SfBarcodeGenerator(
-                          value: 'barcode ${index + 1}',
-                          showValue: false,
-                          symbology: Code128(),
+                        SizedBox(
+                          height: 60,
+                          child: SfBarcodeGenerator(
+                            value: barcode.allBarcodes[index].barcode,
+                            showValue: false,
+                            symbology: Code128(),
+                          ),
                         ),
                       ],
                     ),
@@ -344,9 +345,11 @@ class HomeScreen extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  _showBarcodeDialog(context, barcode, undoBarcode);
+                  _showBarcodeDialog(
+                      context, barcode.storeBarcode, undoBarcode);
                 },
-                child: const Text('Generate Barcode', style: TextStyle(color: Colors.black)),
+                child: const Text('Generate Barcode',
+                    style: TextStyle(color: Colors.black)),
               ),
             )
           ],
@@ -356,10 +359,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   void scanBarcode(
-      BuildContext context,
-      List<Barcode> userTickets,
-      Future<String> Function(String, String, Barcode) barcodeScanned,
-      ) async {
+    BuildContext context,
+    List<UiStoreBarcode> userTickets,
+    Future<String> Function(String) barcodeScanned,
+  ) async {
     String barcodeScanRes;
     String result = '';
 
@@ -367,32 +370,19 @@ class HomeScreen extends StatelessWidget {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "cancel", true, ScanMode.BARCODE);
 
-      String storeName =
-          barcodeScanRes.substring(0, 4) == '2263' ? 'penny' : 'lidl';
-      Barcode originalBarcode = userTickets.firstWhere(
-        (element) => element.store.toString() == storeName,
-        //orElse: () => Barcode(
-          //barcode: barcodeScanRes,
-          //store: BarcodeStore.fromString(storeName),
-        //),
-      );
-      // storeName == 'penny' ? userTickets[1].last : userTickets[0].last;
-
-      // result = await FirestoreService()
-         //  .scanBarcode(barcodeScanRes, storeName, originalBarcode);
-      result = await barcodeScanned(barcodeScanRes, storeName, originalBarcode);
+      result = await barcodeScanned(barcodeScanRes);
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Center(child: Text('Barcode Result')),
+            title: const Center(child: Text('Barcode Result')),
             content: Text(
               result == 'BARCODE_GOOD'
                   ? 'Good Job on recycling! ♻️'
                   : (result == 'BARCODE_USED'
                       ? 'This barcode has already been scanned!'
-                      : 'You have reached the maximum amount!'),
+                      : 'Error scanning barcode! Please try again. 🤖'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 28,
@@ -403,8 +393,8 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () async {
                   Navigator.of(context).pop();
 
-                  await FirestoreService()
-                      .moveBarcodeToScanned(barcodeScanRes, storeName);
+                  // await FirestoreService()
+                  //     .moveBarcodeToScanned(barcodeScanRes, storeName);
                 },
                 icon: Icon(
                   Icons.check_circle,
@@ -435,7 +425,7 @@ class HomeScreen extends StatelessWidget {
         child: _buildContent(
           context,
           state.userName,
-          state.userTickets,
+          state.uiBarcodes,
           state.undoBarcode,
         ),
       );
