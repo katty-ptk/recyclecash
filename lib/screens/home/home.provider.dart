@@ -132,7 +132,7 @@ class HomeProvider extends ChangeNotifier {
       sum += element.value;
     });
 
-    if ( sum != 0 ) {
+    if ( sum > 0 ) {
       return Barcode.injectNewValue(element[0], sum);
     } else {
       return Barcode.dummyBarcode(storeName);

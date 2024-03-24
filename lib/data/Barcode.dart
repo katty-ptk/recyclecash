@@ -130,17 +130,17 @@ class Barcode {
   }
 
   static Barcode dummyBarcode(String storeName) {
-    if (storeName == LIDL_PREFIX) {
+    if (storeName == "lidl") {
       return Barcode(
           barcode: '201000002000000264203810',
           storeName: BarcodeStore.fromString(storeName),
           value: 0);
-    } else if (storeName == PENNY_PREFIX) {
+    } else if (storeName == "penny") {
       return Barcode(
           barcode: '226399992000000264000010',
           storeName: BarcodeStore.fromString(storeName),
           value: 0);
-    } else if (storeName == MEGAIMAGE_PREFIX) {
+    } else if (storeName == "megaimage") {
       return Barcode(
           barcode: '980099992000000260000810',
           storeName: BarcodeStore.fromString(storeName),
@@ -148,7 +148,7 @@ class Barcode {
     }
 
     return Barcode(
-        barcode: '201099992000000264203810',
+        barcode: '201000002000000264203810',
         storeName: BarcodeStore.fromString(storeName),
         value: 0);
   }

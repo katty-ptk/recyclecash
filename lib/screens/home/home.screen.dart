@@ -288,6 +288,20 @@ class HomeScreen extends StatelessWidget {
     UiStoreBarcode barcode,
     Function(Barcode) undoBarcode,
   ) async {
+    List<Widget> actions = [];
+    if ( barcode.storeBarcode.value > 0.0 ) {
+      actions.add(Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            _showBarcodeDialog(
+                context, barcode.storeBarcode, undoBarcode);
+          },
+          child: const Text('Generate Barcode',
+              style: TextStyle(color: Colors.black)),
+        ),
+      ));
+    }
+
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -341,18 +355,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
           ),
-          actions: [
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  _showBarcodeDialog(
-                      context, barcode.storeBarcode, undoBarcode);
-                },
-                child: const Text('Generate Barcode',
-                    style: TextStyle(color: Colors.black)),
-              ),
-            )
-          ],
+          actions: actions,
         );
       },
     );
